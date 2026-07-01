@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wahrheit oder Pflicht</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    <canvas id="confetti-canvas"></canvas>
+    <div class="cursor-glow" id="cursor-glow"></div>
+    <div id="toast-container"></div>
+
+    <div class="app-container">
+
+        <!-- ==========================================
+             LOGIN SCREEN
+             ========================================== -->
+        <div id="login-screen" class="screen active">
+            <div class="login-card">
+                <div class="login-logo">
+                    <div class="logo-orb orb-truth">💭</div>
+                    <div class="logo-orb orb-dare">🎯</div>
+                </div>
+                <h1 class="login-title">Wahrheit oder Pflicht</h1>
+                <p class="login-subtitle">Wähle deinen Namen und gib deine PIN ein</p>
+
+                <div class="player-selection">
+                    <button class="player-btn" data-player="Halil" data-pin="19105887638halil">
+                        <span class="player-avatar">👨</span>
+                        <span>Halil</span>
+                    </button>
+                    <button class="player-btn" data-player="Cornelius" data-pin="Klima1cornelius">
+                        <span class="player-avatar">🧑</span>
+                        <span>Cornelius</span>
+                    </button>
+                    <button class="player-btn" data-player="Roman" data-pin="roma1roman">
+                        <span class="player-avatar">👤</span>
+                        <span>Roman</span>
+                    </button>
+                </div>
+
+                <div class="pin-section" id="pin-section">
+                    <p class="pin-label">PIN eingeben</p>
+                    <div class="pin-input-wrap">
+                        <input type="password" id="pin-input" class="pin-input" placeholder="••••••••" maxlength="30" autocomplete="off">
+                        <button type="button" id="pin-toggle" class="pin-eye-btn" aria-label="PIN anzeigen">
+                            <svg class="eye-icon eye-open" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                            <svg class="eye-icon eye-closed" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:none">
+                                <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.6 21.6 0 0 1 5.06-5.94M9.9 4.24A10.6 10.6 0 0 1 12 4c7 0 11 7 11 7a21.6 21.6 0 0 1-2.94 4.06M14.12 14.12a3 3 0 1 1-4.24-4.24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M1 1l22 22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="pin-strength" id="pin-strength"><span></span><span></span><span></span><span></span></div>
+                    <button id="pin-submit" class="btn btn-primary btn-shine">
+                        <span class="btn-label">Anmelden</span>
+                    </button>
+                    <button id="pin-cancel" class="btn btn-ghost">Abbrechen</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             GAME SCREEN
+             ========================================== -->
+        <div id="game-screen" class="screen">
+
+            <!-- Header -->
+            <div class="game-header">
+                <div class="header-row">
+                    <span class="header-brand">W oder P</span>
+                    <div class="header-right">
+                        <div class="player-chip">
+                            <span class="player-dot"></span>
+                            <span id="current-player">-</span>
+                        </div>
+                        <span id="role-badge" class="role-pill"></span>
+                        <button id="logout-btn" class="btn btn-danger">Abmelden</button>
+                    </div>
+                </div>
+
+                <!-- Admin Bar (nur Halil) -->
+                <div id="admin-bar" class="admin-bar">
+                    <div class="admin-bar-title">⚙️ Admin</div>
+                    <div class="admin-controls">
+                        <button id="reset-round-btn" class="btn btn-admin" style="width:auto">🔄 Reset</button>
+                        <select id="matcher-dropdown" class="admin-select">
+                            <option value="">Fragesteller...</option>
+                            <option value="Halil">Halil</option>
+                            <option value="Cornelius">Cornelius</option>
+                            <option value="Roman">Roman</option>
+                        </select>
+                        <select id="matchee-dropdown" class="admin-select">
+                            <option value="">Zielperson...</option>
+                            <option value="Halil">Halil</option>
+                            <option value="Cornelius">Cornelius</option>
+                            <option value="Roman">Roman</option>
+                        </select>
+                        <button id="assign-btn" class="btn btn-admin" style="width:auto">✓ Zuweisen</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Content -->
+            <div class="game-content">
+
+                <!-- ── WAITING ── -->
+                <div id="waiting-state" class="game-state active">
+                    <div class="card">
+                        <div class="card-eyebrow">⏳ Bereit zum Spielen</div>
+                        <h3>Warten auf Runde...</h3>
+                        <p>Wenn Halil eine neue Runde startet, wirst du automatisch benachrichtigt.</p>
+                        <div class="waiting-players">
+                            <div class="player-row">
+                                <span class="player-row-avatar">⚔️</span>
+                                <span id="waiting-matcher" class="player-row-name">-</span>
+                                <span class="online-badge offline" id="waiting-matcher-status">wartet</span>
+                            </div>
+                            <div class="player-row">
+                                <span class="player-row-avatar">🎯</span>
+                                <span id="waiting-matchee" class="player-row-name">-</span>
+                                <span class="online-badge offline" id="waiting-matchee-status">wartet</span>
+                            </div>
+                        </div>
+                        <button id="start-game-btn" class="btn btn-primary">Neue Runde starten</button>
+                    </div>
+                </div>
+
+                <!-- ── CHOICE (nur MATCHEE wählt!) ── -->
+                <div id="choice-state" class="game-state">
+                    <div class="card">
+                        <div class="card-eyebrow">🎲 Du bist dran!</div>
+                        <div class="choice-header-big">
+                            <p class="choice-target-label">Du wirst gefragt von</p>
+                            <p id="choice-asker" class="choice-target-name">-</p>
+                        </div>
+                        <p style="text-align:center;color:var(--text-2);margin-bottom:20px;font-size:0.95rem;">Was soll es sein?</p>
+                        <div class="choice-grid">
+                            <button id="choice-truth" class="btn btn-truth">
+                                <span class="choice-emoji">💭</span>
+                                <span>Wahrheit</span>
+                            </button>
+                            <button id="choice-dare" class="btn btn-dare">
+                                <span class="choice-emoji">🎯</span>
+                                <span>Pflicht</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── WAITING_FOR_QUESTION (MATCHEE wartet) ── -->
+                <div id="waiting-for-question-state" class="game-state">
+                    <div class="card" style="text-align:center;">
+                        <div class="card-eyebrow" style="justify-content:center;">✅ Wahl gespeichert</div>
+                        <div class="waiting-pulse-wrap">
+                            <div class="pulse-ring">
+                                <div class="pulse-icon" id="wfq-icon">💭</div>
+                            </div>
+                            <div>
+                                <p class="waiting-text" id="wfq-choice-text">Du hast Wahrheit gewählt</p>
+                                <p class="waiting-subtext">Warte, während <strong id="wfq-matcher">-</strong> die Frage schreibt...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── QUESTION_INPUT (nur MATCHER schreibt Frage) ── -->
+                <div id="question-input-state" class="game-state">
+                    <div class="card">
+                        <div class="card-eyebrow">📝 Du bist Fragesteller</div>
+                        <h3>Frage für <span id="qi-matchee-name">-</span></h3>
+                        <p>Die Zielperson hat gewählt – jetzt bist du dran.</p>
+
+                        <div class="round-strip">
+                            <span id="qi-choice-display" class="question-type-badge badge-truth">Wahrheit</span>
+                            <span class="label">gewählt von</span>
+                            <span id="qi-matchee-strip" class="name">-</span>
+                        </div>
+
+                        <p style="font-size:0.85rem;color:var(--text-2);margin-bottom:12px;">Die Zielperson hat <strong id="qi-selected-type">Wahrheit</strong> gewählt – Schreibe deine Frage:</p>
+
+                        <!-- ⚠️ SECURITY FIX v4.1: qi-tags are now read-only (informational only) -->
+                        <div class="qi-choice-strip">
+                            <span class="qi-tag qi-tag-info truth" id="qi-tag-truth" style="cursor:default;pointer-events:none;">💭 Wahrheit</span>
+                            <span class="qi-tag qi-tag-info dare" id="qi-tag-dare" style="cursor:default;pointer-events:none;">🎯 Pflicht</span>
+                        </div>
+
+                        <div class="qi-random-hint" id="qi-random-btn">
+                            🎲 <span>Zufällige Frage einfügen</span>
+                        </div>
+
+                        <textarea id="qi-textarea" class="qi-textarea" placeholder="Schreibe deine Frage oder Aufgabe hier..." maxlength="500"></textarea>
+                        <div class="char-hint"><span id="qi-char-count">0</span>/500</div>
+
+                        <button id="qi-submit-btn" class="btn btn-primary">Frage absenden 📤</button>
+                    </div>
+                </div>
+
+                <!-- ── ANSWER (MATCHEE antwortet) ── -->
+                <div id="answer-state" class="game-state">
+                    <div class="card">
+                        <div class="card-eyebrow">💬 Deine Antwort</div>
+                        <h3>Beantworte die Frage</h3>
+
+                        <div class="question-display">
+                            <div id="answer-type-badge" class="question-type-badge badge-truth">💭 Wahrheit</div>
+                            <p id="answer-question-text" class="question-text-main">Lädt...</p>
+                            <p class="answer-from">Gefragt von <strong id="answer-asker-name">-</strong></p>
+                        </div>
+
+                        <textarea id="answer-textarea" class="answer-textarea" placeholder="Deine Antwort hier..." maxlength="800"></textarea>
+                        <div class="char-hint"><span id="char-count">0</span>/800</div>
+
+                        <div class="proof-box">
+                            <p class="proof-box-label">📸 Beweis hochladen (optional)</p>
+                            <div class="upload-zone">
+                                <label for="proof-file" class="upload-zone-inner">
+                                    <span class="upload-zone-icon">📎</span>
+                                    <span class="upload-zone-text">Bild auswählen</span>
+                                </label>
+                                <input type="file" id="proof-file" accept="image/*">
+                            </div>
+                            <p id="file-name"></p>
+                            <div class="proof-preview" id="proof-preview"><img id="proof-preview-img" alt="Beweisfoto Vorschau"></div>
+                        </div>
+
+                        <div class="answer-btn-row">
+                            <button id="submit-answer-btn" class="btn btn-primary">Antwort abschicken</button>
+                            <button id="skip-answer-btn" class="btn btn-ghost">Überspringen</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── SPECTATOR ── -->
+                <div id="spectator-state" class="game-state">
+                    <div class="card">
+                        <div class="card-eyebrow">👁️ Zuschauer</div>
+                        <h3>Aktuelle Runde</h3>
+                        <div class="round-strip" style="margin-top:16px;">
+                            <span id="spec-matcher" class="name">-</span>
+                            <span class="arrow">→</span>
+                            <span id="spec-matchee" class="name">-</span>
+                        </div>
+                        <div class="spec-status-block">
+                            <div class="spec-spinner"></div>
+                            <p id="spectator-status">Warten...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── COMPLETED ── -->
+                <div id="completed-state" class="game-state">
+                    <div class="card">
+                        <div class="completed-center">
+                            <div class="completed-icon-wrap">✅</div>
+                            <h3>Runde abgeschlossen!</h3>
+                            <p id="completed-message" style="color:var(--text-2);text-align:center;">Antwort gespeichert.</p>
+                        </div>
+                        <div class="divider"></div>
+                        <button id="next-round-btn" class="btn btn-primary">Nächste Runde starten</button>
+                    </div>
+                </div>
+
+            </div><!-- /game-content -->
+
+            <!-- Leaderboard -->
+            <div class="game-history" id="leaderboard-card">
+                <div class="history-title leaderboard-toggle" id="leaderboard-toggle">
+                    <span>🏆 Bestenliste</span>
+                    <span class="leaderboard-toggle-icon" id="leaderboard-toggle-icon">▼</span>
+                </div>
+                <div class="leaderboard-body" id="leaderboard-body">
+                    <p class="empty-history" id="leaderboard-empty">Noch keine Stimmen...</p>
+                </div>
+            </div>
+
+            <!-- History bar -->
+            <div class="game-history">
+                <div class="history-title">📋 Spielverlauf</div>
+                <div id="history-list" class="history-list">
+                    <p class="empty-history">Noch keine Einträge...</p>
+                </div>
+            </div>
+
+            <!-- ⚠️ HISTORY DETAIL MODAL: Show full details of past rounds -->
+            <div id="history-modal" class="history-modal">
+                <div class="history-modal-overlay"></div>
+                <div class="history-modal-content">
+                    <div class="history-modal-header">
+                        <h2>🎯 Runden-Details</h2>
+                        <button id="history-modal-close-btn" class="history-modal-close" aria-label="Schließen">&times;</button>
+                    </div>
+                    <div class="history-modal-body">
+                        <div class="history-detail-section">
+                            <label>Fragesteller (Matcher)</label>
+                            <div class="history-detail-value" id="modal-matcher">-</div>
+                        </div>
+                        <div class="history-detail-section">
+                            <label>Zielperson (Matchee)</label>
+                            <div class="history-detail-value" id="modal-matchee">-</div>
+                        </div>
+                        <div class="history-detail-section">
+                            <label>Typ</label>
+                            <div class="history-detail-badge" id="modal-type">-</div>
+                        </div>
+                        <div class="history-detail-section">
+                            <label>❓ Frage / Aufgabe</label>
+                            <div class="history-detail-text" id="modal-question">-</div>
+                        </div>
+                        <div class="history-detail-section">
+                            <label>💬 Antwort</label>
+                            <div class="history-detail-text" id="modal-answer">-</div>
+                        </div>
+                        <div class="history-detail-section" id="modal-image-section" style="display:none;">
+                            <label>📸 Beweisfoto</label>
+                            <div class="history-item-img"><img id="modal-image" alt="Beweisfoto"></div>
+                            <p class="proof-discord-note" style="font-size:0.78rem;color:var(--text-2);margin-top:6px;">
+                                📎 Das Beweisfoto kann in Discord eingesehen werden.
+                            </p>
+                        </div>
+                        <div class="history-detail-section">
+                            <label>⏳ Zeitstempel</label>
+                            <div class="history-detail-value" id="modal-time">-</div>
+                        </div>
+                        <div class="history-detail-section">
+                            <label>🗳️ Bewertung</label>
+                            <div class="vote-row" id="modal-vote-row"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /game-screen -->
+    </div><!-- /app-container -->
+
+
+    <!-- Firebase + Spiel-Logik (Datenbank, Runden, Rollen) -->
+    <script type="module" src="firebase-game.js"></script>
+
+    <!-- 3D / Animations-Engine (Hintergrund, Tilt, Konfetti, Ripple) -->
+    <script src="animations.js"></script>
+</body>
+</html>
