@@ -13,13 +13,13 @@ import {
 // FIREBASE CONFIG
 // ============================================
 const firebaseConfig = {
-    apiKey: "AIzaSyAZtcxhboviR0Wk6xD3SAyYoLr4PDC2beI",
-    authDomain: "wahrheit-pflicht-7ecf5.firebaseapp.com",
-    databaseURL: "https://wahrheit-pflicht-7ecf5-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "wahrheit-pflicht-7ecf5",
-    storageBucket: "wahrheit-pflicht-7ecf5.firebasestorage.app",
-    messagingSenderId: "481732191200",
-    appId: "1:481732191200:web:fcf9c5b0bbf5deeaa58185"
+    apiKey: "HIER_DEIN_FIREBASE_API_KEY",
+    authDomain: "HIER_DEINE_AUTH_DOMAIN",
+    databaseURL: "HIER_DEINE_DATABASE_URL",
+    projectId: "HIER_DEINE_PROJECT_ID",
+    storageBucket: "HIER_DEIN_STORAGE_BUCKET",
+    messagingSenderId: "HIER_DEINE_MESSAGING_SENDER_ID",
+    appId: "HIER_DEINE_APP_ID"
 };
 
 const fbApp = initializeApp(firebaseConfig);
@@ -32,12 +32,12 @@ const G = {
     player: null,        
     role: null,          
     db: null,            
-    discordWebhook: 'https://discord.com/api/webhooks/1513149934189150258/7nznkiKvltSXoQJ7UXhkNbUKJ5dRF33xq5s4YmcdVAIKR14ttvsnrRo6T7p7fvrX0hPi',
+    discordWebhook: 'HIER_DEIN_DISCORD_WEBHOOK_URL',
     allPlayers: ['Halil', 'Cornelius', 'Roman'],
     pins: {
-        Halil: '19105887638halil',
-        Cornelius: 'Klima1cornelius',
-        Roman: 'roma1roman'
+        Halil: 'HIER_DEINE_PIN_HALIL',
+        Cornelius: 'HIER_DEINE_PIN_CORNELIUS',
+        Roman: 'HIER_DEINE_PIN_ROMAN'
     },
     selectedQuestionType: 'truth',
     proofFile: null // currently selected File object for proof upload (sent directly to Discord)
